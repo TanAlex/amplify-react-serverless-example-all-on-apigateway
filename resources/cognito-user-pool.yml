@@ -1,0 +1,58 @@
+Resources:
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      # Generate a name based on the stage
+      UserPoolName: ${self:custom.stage}-${self:service}
+      # Set email as an alias
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+  CognitoUserPoolClient:
+    # Type: AWS::Cognito::UserPoolClient
+    # Properties:
+    #   # Generate an app client name based on the stage
+    #   ClientName: ${self:custom.stage}-${self:service}-userpool-client
+    #   UserPoolId:
+    #     Ref: CognitoUserPool
+    #   ExplicitAuthFlows:
+    #     - ADMIN_NO_SRP_AUTH
+    #   GenerateSecret: true
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: service-user-pool-client-${opt:stage, self:provider.stage}
+      AllowedOAuthFlows:
+        - implicit
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - phone
+        - email
+        - openid
+        - profile
+        - aws.cognito.signin.user.admin
+      UserPoolId:
+        Ref: CognitoUserPool
+      CallbackURLs: 
+        - https://localhost:3000
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      GenerateSecret: false
+      SupportedIdentityProviders: 
+        - COGNITO
+  
+  # # https://stackoverflow.com/questions/41664708/cognito-user-pool-authorizer-with-serverless-framework
+  # ApiGatewayAuthorizer:
+  #   DependsOn:
+  #   # this is pre-defined by serverless
+  #   - ApiGatewayRestApi
+  #   Type: AWS::ApiGateway::Authorizer
+  #   Properties:
+  #     Name: cognito_auth
+  #     # apparently ApiGatewayRestApi is a global string
+  #     RestApiId: { "Ref" : "ApiGatewayRestApi" }
+  #     IdentitySource: method.request.header.Authorization
+  #     Type: COGNITO_USER_POOLS
+  #     ProviderARNs:
+  #     - Fn::GetAtt: [CognitoUserPool, Arn]
