@@ -84,7 +84,7 @@ The typical way is to create a AWS::ApiGateway::Authorizer then Ref it here
 But unfortunately, they don't work with Amplify and integration:lambda doesn't work with our {proxy+} type path  
 By default, integration type is lambda_proxy which works fine.
 
-The following snippets uses 'authorizer: aws_iam' default (lambda_proxy) integration.  
+The following snippets uses 'authorizer: aws_iam' and default (lambda_proxy) integration.  
 These settings work well with Amplify and Cognito  
 ```
 functions:
@@ -106,6 +106,7 @@ functions:
 Another thing worth mentioning is the 'catch-all' route for React (or any kind of SPA - Single Page App)
 
 For example, if you have a ReactRoute /app/about or something, it's not a real folder in backend Express
+
 It's just a http request path that React will parse and render on.  
 
 So we need to catch all non-existing request path then redirect them to /index.html
